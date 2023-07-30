@@ -7,6 +7,7 @@
     "ios": "react-native run-ios",
     "control:prettier": "prettier . --c",
     "run:prettier": "prettier . --w",
+    "tsc": "tsc",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
