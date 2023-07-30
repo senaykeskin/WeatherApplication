@@ -1,15 +1,15 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
+import * as React from 'react';
 import {StyleSheet, View} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import HomeNavigator from "./src/navigator/homeNavigator/HomeNavigator";
+
 
 function App(): JSX.Element {
-  return <View></View>;
+  return (
+    <NavigationContainer>
+      <HomeNavigator />
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({});
