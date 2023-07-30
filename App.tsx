@@ -6,18 +6,12 @@
  */
 
 import React from 'react';
-import { StyleSheet, View } from "react-native";
+import {StyleSheet, View} from 'react-native';
 
 function App(): JSX.Element {
-  return (
-    <View>
-
-    </View>
-  );
+  return <View></View>;
 }
 
-const styles = StyleSheet.create({
-
-});
+const styles = StyleSheet.create({});
 
 export default App;
