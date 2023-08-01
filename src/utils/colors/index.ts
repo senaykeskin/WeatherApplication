@@ -1,6 +1,6 @@
 export const COLORS = {
   arrow_color: '#000000',
-  background: '#F5F5F5',
+  background: '#72D1DD',
   black: '#000000',
   coffee_container_bg: '#845E40',
   coffee_detail_bg: '#572E16',
