@@ -4,17 +4,30 @@ import {
   ImageBackground,
   ScrollView,
   StatusBar,
-  Text,
-  View,
-} from 'react-native';
+  Text, TouchableWithoutFeedback,
+  View
+} from "react-native";
 import {styles} from './styles';
 import AddIcon from 'react-native-vector-icons/MaterialIcons';
 import Settings from 'react-native-vector-icons/MaterialIcons';
 import Celsius from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../../../utils/colors';
 import Forecast, {ForecastList} from './components/ThreeDaysForecast';
+import {
+  fetchLocations,
+  fetchWeatherForecast,
+} from '../../../services/api/weather';
+import { Routes } from "../../../navigator/routes";
 
 const HomeScreen = ({navigation}: any) => {
+  fetchWeatherForecast({city_name: 'istanbul', days: '7'}).then(data => {
+    console.log('konum özellikleri', data);
+  });
+
+  const navigateCoffees = () => {
+    navigation.navigate(Routes.Search);
+  }
+
   return (
     <View>
       <StatusBar translucent={true} backgroundColor="transparent" />
@@ -22,7 +35,9 @@ const HomeScreen = ({navigation}: any) => {
         style={styles.container}
         source={require('../../../../assets/blue_sky.jpg')}>
         <View style={styles.tabBar}>
-          <AddIcon name={'add'} size={40} color={COLORS.white} />
+          <TouchableWithoutFeedback onPress={() => navigateCoffees()}>
+            <AddIcon name={'add'} size={40} color={COLORS.white} />
+          </TouchableWithoutFeedback>
           <Text style={styles.city_name}>Bayrampaşa</Text>
           <Settings
             name={'settings'}
