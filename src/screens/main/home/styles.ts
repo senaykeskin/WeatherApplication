@@ -9,7 +9,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginTop: '10%',
-    //backgroundColor: "gray"
   },
   city_name: {
     fontWeight: 'bold',
@@ -28,7 +27,6 @@ export const styles = StyleSheet.create({
   degree_area: {
     height: 300,
     marginTop: '10%',
-    //backgroundColor: "pink",
   },
   degree_and_celsius: {
     flexDirection: 'row',
@@ -42,11 +40,10 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    //backgroundColor: "purple"
   },
   celsius: {
     position: 'absolute',
-    top: 25,
+    top: 35,
     right: 110,
     alignSelf: 'center',
     fontWeight: 'bold',
@@ -58,7 +55,38 @@ export const styles = StyleSheet.create({
   },
   weather: {
     fontSize: 30,
+    fontWeight: '600',
     color: COLORS.white,
-    //backgroundColor: "gray"
+    textAlign: 'center',
+  },
+  five_days_forecast_container: {
+    height: 60,
+    width: '90%',
+    backgroundColor: COLORS.five_days_forecast_container,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginTop: '5%',
+    opacity: 0.8,
+  },
+  five_days_forecast: {
+    alignSelf: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.white,
+  },
+  hourly_component: {
+    marginLeft: 10,
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  daily_values_container: {
+    borderRadius: 20,
+    width: '95%',
+    alignSelf: 'center',
+    marginBottom: 20,
+    opacity: 0.8,
+    padding: 25,
+    backgroundColor: COLORS.five_days_forecast_container,
   },
 });
