@@ -17,35 +17,34 @@ import {Routes} from '../../../navigator/routes';
 import IconAndWeather from './components/ThreeDaysForecast';
 import Hourly from './components/HourlyForecast';
 import BottomContainer from './components/OtherInformations';
+import {getData} from '../../../storage';
+import {fetchWeatherForecast} from '../../../services/api/weather';
 
-const HomeScreen = ({route, navigation}: any) => {
-  const weatherData = route.params;
-  const forecastList = weatherData?.weatherDetails.forecast.forecastday;
-  const roundedTemp = Math.floor(weatherData?.weatherDetails.current.temp_c);
+const HomeScreen = ({navigation}: any) => {
+  useEffect(() => {
+    const fetchWeatherData = async () => {
+      const locName = await getData('weatherData');
+      if (locName) {
+        const data = await fetchWeatherForecast({
+          city_name: locName,
+          days: '7',
+        });
+        setWeatherData(data);
+      }
+    };
+    fetchWeatherData().then();
+  });
+
+  const [weatherData, setWeatherData] = useState<any | null>(null);
+  const forecastList = weatherData?.forecast.forecastday;
+  const roundedTemp = Math.floor(weatherData?.current.temp_c);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const weatherData_text = weatherData?.weatherDetails.current.condition.text;
-  const currentList = weatherData?.weatherDetails.current;
-  const currentHour = currentTime.getHours();
-  const today = currentTime.toISOString().slice(0, 10);
+  const weatherData_text = weatherData?.current.condition.text;
+  const currentList = weatherData?.current;
 
   const backgroundImage = () => {
-    let currentHourData;
-    if (forecastList) {
-      const currentHourIndex = forecastList[0].hour.findIndex(
-        (item: any) =>
-          item.time.indexOf(today + ' ' + currentHour + ':' + '00') !== -1,
-      );
-
-      if (currentHourIndex !== -1) {
-        currentHourData = forecastList[0].hour[currentHourIndex];
-        //console.log('Current hour data:', currentHourData);
-      } else {
-        //console.log('Current hour data not found.');
-      }
-    }
-
-    if (currentHourData) {
-      if (currentHourData.is_day === 0) {
+    if (weatherData) {
+      if (currentList.is_day === 0) {
         return require('../../../../assets/night_sky.jpg');
       } else {
         if (weatherData_text.includes('Açık')) {
@@ -55,8 +54,8 @@ const HomeScreen = ({route, navigation}: any) => {
         } else if (weatherData_text.includes('Güneş')) {
           return require('../../../../assets/sunny_sky.jpg');
         } else if (
-          weatherData_text.includes('ağışlı') ||
-          weatherData_text.includes('Hafif ya')
+          weatherData_text.includes('ağış') ||
+          weatherData_text.includes('afif ya')
         ) {
           return require('../../../../assets/rainy_sky.jpg');
         } else if (
@@ -73,7 +72,7 @@ const HomeScreen = ({route, navigation}: any) => {
 
   const image =
     weatherData_text == null
-      ? require('../../../../assets/blue_sky.jpg')
+      ? require('../../../../assets/black_screen.jpg')
       : backgroundImage();
 
   useEffect(() => {
@@ -93,6 +92,17 @@ const HomeScreen = ({route, navigation}: any) => {
     const date = new Date(dateString);
     const dayIndex = date.getDay();
     return daysOfWeek[dayIndex];
+  };
+
+  const getDateLabel = (index: number, date: string) => {
+    switch (index) {
+      case 0:
+        return 'Bugün';
+      case 1:
+        return 'Yarın';
+      default:
+        return getDayLabel(date);
+    }
   };
 
   const List = [
@@ -134,7 +144,7 @@ const HomeScreen = ({route, navigation}: any) => {
           <TouchableWithoutFeedback onPress={() => navigateSearch()}>
             <AddIcon name={'add'} size={40} color={COLORS.add_icon} />
           </TouchableWithoutFeedback>
-          <Text style={styles.city_name}>{weatherData?.weatherData.name}</Text>
+          <Text style={styles.city_name}>{weatherData?.location.name}</Text>
           <Settings
             name={'settings'}
             size={30}
@@ -164,40 +174,19 @@ const HomeScreen = ({route, navigation}: any) => {
           </View>
           <FlatList
             scrollEnabled={false}
-            data={weatherData?.weatherDetails.forecast.forecastday.slice(0, 3)}
+            data={weatherData?.forecast.forecastday.slice(0, 3)}
             keyExtractor={item => item.date_epoch.toString()}
             renderItem={({item, index}) => {
-              if (index === 0) {
-                return (
-                  <IconAndWeather
-                    icon={'https:' + item.day.condition.icon}
-                    date={'Bugün'}
-                    text={item.day.condition.text}
-                    maxTemp={item.day.maxtemp_c}
-                    minTemp={item.day.mintemp_c}
-                  />
-                );
-              } else if (index === 1) {
-                return (
-                  <IconAndWeather
-                    icon={'https:' + item.day.condition.icon}
-                    date={'Yarın'}
-                    text={item.day.condition.text}
-                    maxTemp={item.day.maxtemp_c}
-                    minTemp={item.day.mintemp_c}
-                  />
-                );
-              } else {
-                return (
-                  <IconAndWeather
-                    icon={'https:' + item.day.condition.icon}
-                    date={getDayLabel(item.date)}
-                    text={item.day.condition.text}
-                    maxTemp={item.day.maxtemp_c}
-                    minTemp={item.day.mintemp_c}
-                  />
-                );
-              }
+              const dateLabel = getDateLabel(index, item.date);
+              return (
+                <IconAndWeather
+                  icon={'https:' + item.day.condition.icon}
+                  date={dateLabel}
+                  text={item.day.condition.text}
+                  maxTemp={item.day.maxtemp_c}
+                  minTemp={item.day.mintemp_c}
+                />
+              );
             }}
             numColumns={1}
           />
@@ -217,6 +206,7 @@ const HomeScreen = ({route, navigation}: any) => {
                   const itemDate = new Date(item.time).getDate();
                   const itemHour = new Date(item.time).getHours();
                   const currentDate = currentTime.getDate();
+                  const currentHour = currentTime.getHours();
 
                   return (
                     (itemDate === currentDate && itemHour >= currentHour) ||

@@ -17,7 +17,7 @@ export const apiCall = async (endpoint: any) => {
     const response = await axios.request(options);
     return response.data;
   } catch (err) {
-    console.log('error:', err);
+    //console.log('error:', err);
     return null;
   }
 };
