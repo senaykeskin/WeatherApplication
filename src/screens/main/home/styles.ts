@@ -63,7 +63,7 @@ export const styles = StyleSheet.create({
     height: 60,
     width: '90%',
     backgroundColor: COLORS.five_days_forecast_container,
-    borderRadius: 20,
+    borderRadius: 30,
     justifyContent: 'center',
     alignSelf: 'center',
     marginTop: '5%',

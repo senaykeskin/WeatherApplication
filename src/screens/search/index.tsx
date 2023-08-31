@@ -15,6 +15,7 @@ import {debounce} from 'lodash';
 import {fetchLocations, fetchWeatherForecast} from '../../services/api/weather';
 import {Location} from '../../services/api/response';
 import {Routes} from '../../navigator/routes';
+import {removeData, setData} from '../../storage';
 
 const SearchScreen = ({navigation}: any) => {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -29,19 +30,17 @@ const SearchScreen = ({navigation}: any) => {
         });
 
         if (data) {
-          //console.log('konum özellikleri', loc);
-          navigation.navigate(Routes.Home, {
-            weatherData: loc,
-            weatherDetails: data,
-          });
+          await removeData('weatherData');
+          await setData('weatherData', loc.name);
+          navigation.navigate(Routes.Home);
         } else {
-          console.log("fetchWeatherForecast'tan veri alınamadı.");
+          //console.log("fetchWeatherForecast'tan veri alınamadı.");
         }
       } catch (error) {
-        console.error('Hata:', error);
+        //console.error('Hata:', error);
       }
     } else {
-      console.log('Geçersiz konum bilgisi.');
+      //console.log('Geçersiz konum bilgisi.');
     }
   };
 

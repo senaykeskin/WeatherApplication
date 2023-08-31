@@ -17,35 +17,35 @@ import {Routes} from '../../../navigator/routes';
 import IconAndWeather from './components/ThreeDaysForecast';
 import Hourly from './components/HourlyForecast';
 import BottomContainer from './components/OtherInformations';
+import {getData} from '../../../storage';
+import {fetchWeatherForecast} from '../../../services/api/weather';
+import { useFocusEffect } from "@react-navigation/native";
 
-const HomeScreen = ({route, navigation}: any) => {
-  const weatherData = route.params;
-  const forecastList = weatherData?.weatherDetails.forecast.forecastday;
-  const roundedTemp = Math.floor(weatherData?.weatherDetails.current.temp_c);
+const HomeScreen = ({navigation}: any) => {
+  useFocusEffect(() => {
+    const fetchWeatherData = async () => {
+      const locName = await getData('weatherData');
+      if (locName) {
+        const data = await fetchWeatherForecast({
+          city_name: locName,
+          days: '7',
+        });
+        setWeatherData(data);
+      }
+    };
+    fetchWeatherData().then();
+  });
+
+  const [weatherData, setWeatherData] = useState<any | null>(null);
+  const forecastList = weatherData?.forecast.forecastday;
+  const roundedTemp = Math.floor(weatherData?.current.temp_c);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const weatherData_text = weatherData?.weatherDetails.current.condition.text;
-  const currentList = weatherData?.weatherDetails.current;
-  const currentHour = currentTime.getHours();
-  const today = currentTime.toISOString().slice(0, 10);
+  const weatherData_text = weatherData?.current.condition.text;
+  const currentList = weatherData?.current;
 
   const backgroundImage = () => {
-    let currentHourData;
-    if (forecastList) {
-      const currentHourIndex = forecastList[0].hour.findIndex(
-        (item: any) =>
-          item.time.indexOf(today + ' ' + currentHour + ':' + '00') !== -1,
-      );
-
-      if (currentHourIndex !== -1) {
-        currentHourData = forecastList[0].hour[currentHourIndex];
-        //console.log('Current hour data:', currentHourData);
-      } else {
-        //console.log('Current hour data not found.');
-      }
-    }
-
-    if (currentHourData) {
-      if (currentHourData.is_day === 0) {
+    if (weatherData) {
+      if (currentList.is_day === 0) {
         return require('../../../../assets/night_sky.jpg');
       } else {
         if (weatherData_text.includes('Açık')) {
@@ -55,8 +55,8 @@ const HomeScreen = ({route, navigation}: any) => {
         } else if (weatherData_text.includes('Güneş')) {
           return require('../../../../assets/sunny_sky.jpg');
         } else if (
-          weatherData_text.includes('ağışlı') ||
-          weatherData_text.includes('Hafif ya')
+          weatherData_text.includes('ağış') ||
+          weatherData_text.includes('afif ya')
         ) {
           return require('../../../../assets/rainy_sky.jpg');
         } else if (
@@ -73,7 +73,7 @@ const HomeScreen = ({route, navigation}: any) => {
 
   const image =
     weatherData_text == null
-      ? require('../../../../assets/blue_sky.jpg')
+      ? require('../../../../assets/black_screen.jpg')
       : backgroundImage();
 
   useEffect(() => {
@@ -93,6 +93,33 @@ const HomeScreen = ({route, navigation}: any) => {
     const date = new Date(dateString);
     const dayIndex = date.getDay();
     return daysOfWeek[dayIndex];
+  };
+
+  const getDateLabel = (index: number, date: string) => {
+    switch (index) {
+      case 0:
+        return 'Bugün';
+      case 1:
+        return 'Yarın';
+      default:
+        return getDayLabel(date);
+    }
+  };
+
+  const getHourLabel = (index: number, item: any) => {
+
+    const ItemDay = item.time.substring(8,10);
+    const ItemMonth = item.time.substring(5,7);
+
+    const time = `${ItemDay}/${ItemMonth}`;
+
+    if (index === 0) {
+      return "Şimdi";
+    } else if (item.time.substring(11,16) === "00:00") {
+      return time;
+    } else {
+      return item.time.substring(11,16);
+    }
   };
 
   const List = [
@@ -134,7 +161,7 @@ const HomeScreen = ({route, navigation}: any) => {
           <TouchableWithoutFeedback onPress={() => navigateSearch()}>
             <AddIcon name={'add'} size={40} color={COLORS.add_icon} />
           </TouchableWithoutFeedback>
-          <Text style={styles.city_name}>{weatherData?.weatherData.name}</Text>
+          <Text style={styles.city_name}>{weatherData?.location.name}</Text>
           <Settings
             name={'settings'}
             size={30}
@@ -164,40 +191,19 @@ const HomeScreen = ({route, navigation}: any) => {
           </View>
           <FlatList
             scrollEnabled={false}
-            data={weatherData?.weatherDetails.forecast.forecastday.slice(0, 3)}
+            data={weatherData?.forecast.forecastday.slice(0, 3)}
             keyExtractor={item => item.date_epoch.toString()}
             renderItem={({item, index}) => {
-              if (index === 0) {
-                return (
-                  <IconAndWeather
-                    icon={'https:' + item.day.condition.icon}
-                    date={'Bugün'}
-                    text={item.day.condition.text}
-                    maxTemp={item.day.maxtemp_c}
-                    minTemp={item.day.mintemp_c}
-                  />
-                );
-              } else if (index === 1) {
-                return (
-                  <IconAndWeather
-                    icon={'https:' + item.day.condition.icon}
-                    date={'Yarın'}
-                    text={item.day.condition.text}
-                    maxTemp={item.day.maxtemp_c}
-                    minTemp={item.day.mintemp_c}
-                  />
-                );
-              } else {
-                return (
-                  <IconAndWeather
-                    icon={'https:' + item.day.condition.icon}
-                    date={getDayLabel(item.date)}
-                    text={item.day.condition.text}
-                    maxTemp={item.day.maxtemp_c}
-                    minTemp={item.day.mintemp_c}
-                  />
-                );
-              }
+              const dateLabel = getDateLabel(index, item.date);
+              return (
+                <IconAndWeather
+                  icon={'https:' + item.day.condition.icon}
+                  date={dateLabel}
+                  text={item.day.condition.text}
+                  maxTemp={item.day.maxtemp_c}
+                  minTemp={item.day.mintemp_c}
+                />
+              );
             }}
             numColumns={1}
           />
@@ -214,26 +220,44 @@ const HomeScreen = ({route, navigation}: any) => {
                 ?.map((day: any) => day.hour)
                 .flat()
                 .filter((item: any) => {
-                  const itemDate = new Date(item.time).getDate();
                   const itemHour = new Date(item.time).getHours();
-                  const currentDate = currentTime.getDate();
+                  const itemDate = new Date(item.time);
+
+                  const year = itemDate.getFullYear();
+                  const month = String(itemDate.getMonth() + 1).padStart(2, '0');
+                  const day = String(itemDate.getDate()).padStart(2, '0');
+                  const fullItemDate = `${year}-${month}-${day}`
+                  const numericItemDate = parseInt(fullItemDate.replace(/-/g, ''), 10);
+
+                  const currentHour = currentTime.getHours();
+                  const currentDate = currentTime;
+
+                  const year2 = currentDate.getFullYear();
+                  const month2 = String(currentDate.getMonth() + 1).padStart(2, '0');
+                  const day2 = String(currentDate.getDate()).padStart(2, '0');
+                  const formattedCurrentDate = `${year2}-${month2}-${day2}`
+                  const numericCurrentDate = parseInt(formattedCurrentDate.replace(/-/g, ''), 10);
 
                   return (
-                    (itemDate === currentDate && itemHour >= currentHour) ||
-                    itemDate > currentDate
+                    (numericItemDate === numericCurrentDate && itemHour >= currentHour) ||
+                    numericItemDate > numericCurrentDate
                   );
                 })
-                .slice(0, 17)}
+                .slice(0, 24)}
               overScrollMode="never"
-              renderItem={({item}) => (
-                <Hourly
-                  hour={item.time.substring(11, 16)}
-                  weather={item.temp_c}
-                  icon={'https:' + item.condition.icon}
-                  wind={item.wind_kph}
-                  wind_dir={item.wind_dir}
-                />
-              )}
+              keyExtractor={item => item.time}
+              renderItem={({item, index}) => {
+                const hourData = getHourLabel(index, item);
+                return (
+                  <Hourly
+                    hour={hourData}
+                    weather={item.temp_c}
+                    icon={'https:' + item.condition.icon}
+                    wind={item.wind_kph}
+                    wind_dir={item.wind_dir}
+                  />
+                );
+              }}
               showsHorizontalScrollIndicator={false}
             />
           )}
