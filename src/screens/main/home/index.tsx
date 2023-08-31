@@ -106,6 +106,22 @@ const HomeScreen = ({navigation}: any) => {
     }
   };
 
+  const getHourLabel = (index: number, item: any) => {
+
+    const ItemDay = item.time.substring(8,10);
+    const ItemMonth = item.time.substring(5,7);
+
+    const time = `${ItemDay}/${ItemMonth}`;
+
+    if (index === 0) {
+      return "Şimdi";
+    } else if (item.time.substring(11,16) === "00:00") {
+      return time;
+    } else {
+      return item.time.substring(11,16);
+    }
+  };
+
   const List = [
     {
       text: 'Hissedilen',
@@ -229,15 +245,19 @@ const HomeScreen = ({navigation}: any) => {
                 })
                 .slice(0, 24)}
               overScrollMode="never"
-              renderItem={({item}) => (
-                <Hourly
-                  hour={item.time.substring(11, 16)}
-                  weather={item.temp_c}
-                  icon={'https:' + item.condition.icon}
-                  wind={item.wind_kph}
-                  wind_dir={item.wind_dir}
-                />
-              )}
+              keyExtractor={item => item.time}
+              renderItem={({item, index}) => {
+                const hourData = getHourLabel(index, item);
+                return (
+                  <Hourly
+                    hour={hourData}
+                    weather={item.temp_c}
+                    icon={'https:' + item.condition.icon}
+                    wind={item.wind_kph}
+                    wind_dir={item.wind_dir}
+                  />
+                );
+              }}
               showsHorizontalScrollIndicator={false}
             />
           )}
