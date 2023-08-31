@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import HomeNavigator from './src/navigator/homeNavigator/HomeNavigator';
-import {setData, getData, removeData} from './src/storage';
+import {setData, getData} from './src/storage';
 import {useEffect} from 'react';
 
 function App(): JSX.Element {

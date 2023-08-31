@@ -19,9 +19,10 @@ import Hourly from './components/HourlyForecast';
 import BottomContainer from './components/OtherInformations';
 import {getData} from '../../../storage';
 import {fetchWeatherForecast} from '../../../services/api/weather';
+import { useFocusEffect } from "@react-navigation/native";
 
 const HomeScreen = ({navigation}: any) => {
-  useEffect(() => {
+  useFocusEffect(() => {
     const fetchWeatherData = async () => {
       const locName = await getData('weatherData');
       if (locName) {
@@ -203,17 +204,30 @@ const HomeScreen = ({navigation}: any) => {
                 ?.map((day: any) => day.hour)
                 .flat()
                 .filter((item: any) => {
-                  const itemDate = new Date(item.time).getDate();
                   const itemHour = new Date(item.time).getHours();
-                  const currentDate = currentTime.getDate();
+                  const itemDate = new Date(item.time);
+
+                  const year = itemDate.getFullYear();
+                  const month = String(itemDate.getMonth() + 1).padStart(2, '0');
+                  const day = String(itemDate.getDate()).padStart(2, '0');
+                  const fullItemDate = `${year}-${month}-${day}`
+                  const numericItemDate = parseInt(fullItemDate.replace(/-/g, ''), 10);
+
                   const currentHour = currentTime.getHours();
+                  const currentDate = currentTime;
+
+                  const year2 = currentDate.getFullYear();
+                  const month2 = String(currentDate.getMonth() + 1).padStart(2, '0');
+                  const day2 = String(currentDate.getDate()).padStart(2, '0');
+                  const formattedCurrentDate = `${year2}-${month2}-${day2}`
+                  const numericCurrentDate = parseInt(formattedCurrentDate.replace(/-/g, ''), 10);
 
                   return (
-                    (itemDate === currentDate && itemHour >= currentHour) ||
-                    itemDate > currentDate
+                    (numericItemDate === numericCurrentDate && itemHour >= currentHour) ||
+                    numericItemDate > numericCurrentDate
                   );
                 })
-                .slice(0, 17)}
+                .slice(0, 24)}
               overScrollMode="never"
               renderItem={({item}) => (
                 <Hourly
