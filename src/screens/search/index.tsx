@@ -14,7 +14,6 @@ import {COLORS} from '../../utils/colors';
 import {debounce} from 'lodash';
 import {fetchLocations, fetchWeatherForecast} from '../../services/api/weather';
 import {Location} from '../../services/api/response';
-import {Routes} from '../../navigator/routes';
 import {removeData, setData} from '../../storage';
 
 const SearchScreen = ({navigation}: any) => {
@@ -32,7 +31,8 @@ const SearchScreen = ({navigation}: any) => {
         if (data) {
           await removeData('weatherData');
           await setData('weatherData', loc.name);
-          navigation.navigate(Routes.Home);
+
+          navigation.navigate(navigation.goBack());
         } else {
           //console.log("fetchWeatherForecast'tan veri alınamadı.");
         }
