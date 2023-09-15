@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
   View,
   ActivityIndicator,
-  Dimensions,
 } from 'react-native';
 import {styles} from './styles';
 import AddIcon from 'react-native-vector-icons/MaterialIcons';
@@ -24,7 +23,7 @@ import {fetchDataTransfer} from '../../../constants';
 
 const HomeScreen = ({navigation}: any) => {
   const [weatherData, setWeatherData] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -162,155 +161,156 @@ const HomeScreen = ({navigation}: any) => {
 
   return (
     <View>
-      {isLoading && (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <ActivityIndicator
-            size={40}
-            color="black"
-            style={{
-              position: 'absolute',
-              top: Dimensions.get('window').height / 2,
-              left: Dimensions.get('window').width / 2,
-              zIndex: 999,
-            }}
-          />
-        </View>
-      )}
       <StatusBar
         translucent={true}
         backgroundColor={COLORS.home_status_bar_bg}
       />
-      <ImageBackground blurRadius={0} style={styles.container} source={image}>
-        <View style={styles.tabBar}>
-          <TouchableWithoutFeedback onPress={() => navigateSearch()}>
-            <AddIcon name={'add'} size={40} color={COLORS.add_icon} />
-          </TouchableWithoutFeedback>
-          <Text style={styles.city_name}>{weatherData?.location.name}</Text>
-          <Settings
-            name={'settings'}
-            size={30}
-            color={COLORS.white}
-            style={styles.settings_icon}
-          />
+      {!weatherData ? (
+        <View style={styles.splash_bg}>
+          <View style={styles.splash_text_container}>
+            <Text style={styles.splash_text}>Yalnızca 1 saniye...</Text>
+          </View>
         </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          nestedScrollEnabled={true}
-          scrollEnabled={true}
-          style={styles.scroll}
-          overScrollMode="never">
-          <View style={styles.degree_area}>
-            <View style={styles.degree_and_celsius}>
-              <Text style={styles.degree}>{roundedTemp}</Text>
-              <Celsius
-                name={'temperature-celsius'}
-                size={30}
-                color={COLORS.white}
-                style={styles.celsius}
-              />
-            </View>
-            <View style={styles.area}>
-              <Text style={styles.weather}>{weatherData_text}</Text>
-            </View>
+      ) : (
+        <ImageBackground blurRadius={0} style={styles.container} source={image}>
+          {isLoading && (
+            <ActivityIndicator
+              size={40}
+              color={COLORS.indicator}
+              style={styles.indicator}
+            />
+          )}
+          <View style={styles.tabBar}>
+            <TouchableWithoutFeedback onPress={() => navigateSearch()}>
+              <AddIcon name={'add'} size={40} color={COLORS.add_icon} />
+            </TouchableWithoutFeedback>
+            <Text style={styles.city_name}>{weatherData?.location.name}</Text>
+            <Settings
+              name={'settings'}
+              size={30}
+              color={COLORS.white}
+              style={styles.settings_icon}
+            />
           </View>
-          <FlatList
-            scrollEnabled={false}
-            data={weatherData?.forecast.forecastday.slice(0, 3)}
-            keyExtractor={item => item.date_epoch.toString()}
-            renderItem={({item, index}) => {
-              const dateLabel = getDateLabel(index, item.date);
-              return (
-                <IconAndWeather
-                  icon={'https:' + item.day.condition.icon}
-                  date={dateLabel}
-                  text={item.day.condition.text}
-                  maxTemp={item.day.maxtemp_c}
-                  minTemp={item.day.mintemp_c}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
+            style={styles.scroll}
+            overScrollMode="never">
+            <View style={styles.degree_area}>
+              <View style={styles.degree_and_celsius}>
+                <Text style={styles.degree}>{roundedTemp}</Text>
+                <Celsius
+                  name={'temperature-celsius'}
+                  size={30}
+                  color={COLORS.white}
+                  style={styles.celsius}
                 />
-              );
-            }}
-            numColumns={1}
-          />
-          <View style={styles.five_days_forecast_container}>
-            <Text style={styles.five_days_forecast}>
-              5 günlük hava durumu tahmini
-            </Text>
-          </View>
-          {forecastList && (
+              </View>
+              <View style={styles.area}>
+                <Text style={styles.weather}>{weatherData_text}</Text>
+              </View>
+            </View>
             <FlatList
-              horizontal={true}
-              style={styles.hourly_component}
-              data={forecastList
-                ?.map((day: any) => day.hour)
-                .flat()
-                .filter((item: any) => {
-                  const itemHour = new Date(item.time).getHours();
-                  const itemDate = new Date(item.time);
-
-                  const year = itemDate.getFullYear();
-                  const month = String(itemDate.getMonth() + 1).padStart(
-                    2,
-                    '0',
-                  );
-                  const day = String(itemDate.getDate()).padStart(2, '0');
-                  const fullItemDate = `${year}-${month}-${day}`;
-                  const numericItemDate = parseInt(
-                    fullItemDate.replace(/-/g, ''),
-                    10,
-                  );
-
-                  const currentHour = currentTime.getHours();
-                  const currentDate = currentTime;
-
-                  const year2 = currentDate.getFullYear();
-                  const month2 = String(currentDate.getMonth() + 1).padStart(
-                    2,
-                    '0',
-                  );
-                  const day2 = String(currentDate.getDate()).padStart(2, '0');
-                  const formattedCurrentDate = `${year2}-${month2}-${day2}`;
-                  const numericCurrentDate = parseInt(
-                    formattedCurrentDate.replace(/-/g, ''),
-                    10,
-                  );
-
-                  return (
-                    (numericItemDate === numericCurrentDate &&
-                      itemHour >= currentHour) ||
-                    numericItemDate > numericCurrentDate
-                  );
-                })
-                .slice(0, 24)}
-              overScrollMode="never"
-              keyExtractor={item => item.time}
+              scrollEnabled={false}
+              data={weatherData?.forecast.forecastday.slice(0, 3)}
+              keyExtractor={item => item.date_epoch.toString()}
               renderItem={({item, index}) => {
-                const hourData = getHourLabel(index, item);
+                const dateLabel = getDateLabel(index, item.date);
                 return (
-                  <Hourly
-                    hour={hourData}
-                    weather={item.temp_c}
-                    icon={'https:' + item.condition.icon}
-                    wind={item.wind_kph}
-                    wind_dir={item.wind_dir}
+                  <IconAndWeather
+                    icon={'https:' + item.day.condition.icon}
+                    date={dateLabel}
+                    text={item.day.condition.text}
+                    maxTemp={item.day.maxtemp_c}
+                    minTemp={item.day.mintemp_c}
                   />
                 );
               }}
-              showsHorizontalScrollIndicator={false}
+              numColumns={1}
             />
-          )}
-          {weatherData && (
-            <FlatList
-              style={styles.daily_values_container}
-              scrollEnabled={false}
-              data={List}
-              numColumns={2}
-              renderItem={({item}) => (
-                <BottomContainer text={item.text} value={item.value} />
-              )}
-            />
-          )}
-        </ScrollView>
-      </ImageBackground>
+            <View style={styles.five_days_forecast_container}>
+              <Text style={styles.five_days_forecast}>
+                5 günlük hava durumu tahmini
+              </Text>
+            </View>
+            {forecastList && (
+              <FlatList
+                horizontal={true}
+                style={styles.hourly_component}
+                data={forecastList
+                  ?.map((day: any) => day.hour)
+                  .flat()
+                  .filter((item: any) => {
+                    const itemHour = new Date(item.time).getHours();
+                    const itemDate = new Date(item.time);
+
+                    const year = itemDate.getFullYear();
+                    const month = String(itemDate.getMonth() + 1).padStart(
+                      2,
+                      '0',
+                    );
+                    const day = String(itemDate.getDate()).padStart(2, '0');
+                    const fullItemDate = `${year}-${month}-${day}`;
+                    const numericItemDate = parseInt(
+                      fullItemDate.replace(/-/g, ''),
+                      10,
+                    );
+
+                    const currentHour = currentTime.getHours();
+                    const currentDate = currentTime;
+
+                    const year2 = currentDate.getFullYear();
+                    const month2 = String(currentDate.getMonth() + 1).padStart(
+                      2,
+                      '0',
+                    );
+                    const day2 = String(currentDate.getDate()).padStart(2, '0');
+                    const formattedCurrentDate = `${year2}-${month2}-${day2}`;
+                    const numericCurrentDate = parseInt(
+                      formattedCurrentDate.replace(/-/g, ''),
+                      10,
+                    );
+
+                    return (
+                      (numericItemDate === numericCurrentDate &&
+                        itemHour >= currentHour) ||
+                      numericItemDate > numericCurrentDate
+                    );
+                  })
+                  .slice(0, 24)}
+                overScrollMode="never"
+                keyExtractor={item => item.time}
+                renderItem={({item, index}) => {
+                  const hourData = getHourLabel(index, item);
+                  return (
+                    <Hourly
+                      hour={hourData}
+                      weather={item.temp_c}
+                      icon={'https:' + item.condition.icon}
+                      wind={item.wind_kph}
+                      wind_dir={item.wind_dir}
+                    />
+                  );
+                }}
+                showsHorizontalScrollIndicator={false}
+              />
+            )}
+            {weatherData && (
+              <FlatList
+                style={styles.daily_values_container}
+                scrollEnabled={false}
+                data={List}
+                numColumns={2}
+                renderItem={({item}) => (
+                  <BottomContainer text={item.text} value={item.value} />
+                )}
+              />
+            )}
+          </ScrollView>
+        </ImageBackground>
+      )}
     </View>
   );
 };

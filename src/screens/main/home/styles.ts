@@ -5,6 +5,25 @@ export const styles = StyleSheet.create({
   container: {
     height: '100%',
   },
+  splash_bg: {
+    height: '100%',
+    backgroundColor: COLORS.black,
+  },
+  splash_text_container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  splash_text: {
+    color: COLORS.gray,
+    fontSize: 17,
+  },
+  indicator: {
+    position: 'absolute',
+    top: Dimensions.get('window').height / 2,
+    left: Dimensions.get('window').width / 2 - 20,
+    zIndex: 999,
+  },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
