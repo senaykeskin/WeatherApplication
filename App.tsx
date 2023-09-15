@@ -8,7 +8,21 @@ function App(): JSX.Element {
   useEffect(() => {
     fetchDataTransfer().then();
   });
+import {setData, getData} from './src/storage';
+import {useEffect} from 'react';
 
+function App(): JSX.Element {
+  useEffect(() => {
+    const fetchData = async () => {
+      const firstData = await getData('weatherData');
+      if (firstData === null) {
+        const locName = 'Ankara';
+        await setData('weatherData', locName);
+        console.log('aaa', await getData('weatherData'));
+      }
+    };
+    fetchData().then();
+  }, []);
   return (
     <NavigationContainer>
       <HomeNavigator />

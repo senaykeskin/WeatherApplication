@@ -16,6 +16,7 @@ import {fetchLocations, fetchWeatherForecast} from '../../services/api/weather';
 import {Location} from '../../services/api/response';
 import {removeData, setData} from '../../storage';
 import {Routes} from '../../navigator/routes';
+import {removeData, setData} from '../../storage';
 
 const SearchScreen = ({navigation}: any) => {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -38,6 +39,8 @@ const SearchScreen = ({navigation}: any) => {
           await setData('weatherData', loc.name);
 
           navigateHome();
+          navigation.navigate(Routes.Home);
+
         } else {
           //console.log("fetchWeatherForecast'tan veri alınamadı.");
         }
