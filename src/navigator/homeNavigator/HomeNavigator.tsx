@@ -1,8 +1,8 @@
 import {createStackNavigator} from '@react-navigation/stack';
 import {Routes} from '../routes';
 import HomeScreen from '../../screens/main/home';
-import {onGestureHandlerEvent} from 'react-native-gesture-handler/lib/typescript/handlers/gestures/eventReceiver';
 import SearchScreen from '../../screens/search';
+import SplashScreen from '../../screens/splash';
 
 const StackMain = createStackNavigator();
 const HomeNavigator = () => {
@@ -17,6 +17,11 @@ const HomeNavigator = () => {
         name={Routes.Search}
         component={SearchScreen}
         options={{headerShown: true, title: ''}}
+      />
+      <StackMain.Screen
+        name={Routes.Splash}
+        component={SplashScreen}
+        options={{headerShown: false}}
       />
     </StackMain.Navigator>
   );
