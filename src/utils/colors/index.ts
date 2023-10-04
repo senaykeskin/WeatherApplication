@@ -7,6 +7,7 @@ export const COLORS = {
   home_status_bar_bg: 'transparent',
   hours: '#FFE4C4',
   indicator: '#FFC0CB',
+  dark_gray: '#1D1D1D',
   search_bar_bg: '#E9E9E9',
   search_icon: '#686868',
   search_results_container_bg: '#EDEDED',

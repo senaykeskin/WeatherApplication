@@ -1,5 +1,6 @@
 import {getData, setData} from '../storage';
 import {fetchWeatherForecast} from '../services/api/weather';
+import {STRINGS} from '../utils/strings';
 
 export const apiKey = '42ce10d468d641cfa7d153147232907';
 
@@ -13,4 +14,60 @@ export const fetchDataTransfer = async () => {
     city_name: await getData('weatherData'),
     days: '7',
   });
+};
+
+export const getWindDirection = (props: any) => {
+  switch (props) {
+    case 'N':
+      return {transform: [{rotate: '-45deg'}]};
+    case 'NNE':
+      return {transform: [{rotate: '-22.5deg'}]};
+    case 'NE':
+      return {transform: [{rotate: '0deg'}]};
+    case 'ENE':
+      return {transform: [{rotate: '22.5deg'}]};
+    case 'E':
+      return {transform: [{rotate: '45deg'}]};
+    case 'ESE':
+      return {transform: [{rotate: '67.5deg'}]};
+    case 'SE':
+      return {transform: [{rotate: '90deg'}]};
+    case 'SSE':
+      return {transform: [{rotate: '112.5deg'}]};
+    case 'S':
+      return {transform: [{rotate: '135deg'}]};
+    case 'SSW':
+      return {transform: [{rotate: '157.5deg'}]};
+    case 'SW':
+      return {transform: [{rotate: '180deg'}]};
+    case 'WSW':
+      return {transform: [{rotate: '202.5deg'}]};
+    case 'W':
+      return {transform: [{rotate: '225deg'}]};
+    case 'WNW':
+      return {transform: [{rotate: '247.4deg'}]};
+    case 'NW':
+      return {transform: [{rotate: '270deg'}]};
+    case 'NNW':
+      return {transform: [{rotate: '292.5deg'}]};
+    default:
+  }
+};
+
+export const getDayLabel = (dateString: string) => {
+  const daysOfWeek = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+  const date = new Date(dateString);
+  const dayIndex = date.getDay();
+  return daysOfWeek[dayIndex];
+};
+
+export const getDateLabel = (index: number, date: string) => {
+  switch (index) {
+    case 0:
+      return STRINGS.today;
+    case 1:
+      return STRINGS.tomorrow;
+    default:
+      return getDayLabel(date);
+  }
 };
