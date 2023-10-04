@@ -2,7 +2,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {Routes} from '../routes';
 import HomeScreen from '../../screens/main/home';
 import SearchScreen from '../../screens/search';
-import SplashScreen from '../../screens/splash';
+import ForecastScreen from '../../screens/fiveDaysForecast';
+import {COLORS} from '../../utils/colors';
 
 const StackMain = createStackNavigator();
 const HomeNavigator = () => {
@@ -19,9 +20,14 @@ const HomeNavigator = () => {
         options={{headerShown: true, title: ''}}
       />
       <StackMain.Screen
-        name={Routes.Splash}
-        component={SplashScreen}
-        options={{headerShown: false}}
+        name={Routes.Forecast}
+        component={ForecastScreen}
+        options={{
+          headerShown: true,
+          title: '',
+          headerStyle: {backgroundColor: COLORS.black},
+          headerTintColor: COLORS.white,
+        }}
       />
     </StackMain.Navigator>
   );

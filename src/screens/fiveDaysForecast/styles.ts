@@ -5,11 +5,12 @@ export const styles = StyleSheet.create({
   container: {
     height: '100%',
     backgroundColor: COLORS.black,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   text: {
-    fontSize: 15,
-    color: 'gray',
+    fontSize: 33,
+    color: COLORS.white,
+    marginLeft: '5%',
+    marginTop: '3%',
+    fontWeight: '300',
   },
 });

@@ -19,7 +19,8 @@ import IconAndWeather from './components/ThreeDaysForecast';
 import Hourly from './components/HourlyForecast';
 import BottomContainer from './components/OtherInformations';
 import {useFocusEffect} from '@react-navigation/native';
-import {fetchDataTransfer} from '../../../constants';
+import {fetchDataTransfer, getDateLabel} from '../../../constants';
+import {STRINGS} from '../../../utils/strings';
 
 const HomeScreen = ({navigation}: any) => {
   const [weatherData, setWeatherData] = useState<any | null>(null);
@@ -98,22 +99,8 @@ const HomeScreen = ({navigation}: any) => {
     navigation.navigate(Routes.Search);
   };
 
-  const getDayLabel = (dateString: string) => {
-    const daysOfWeek = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
-    const date = new Date(dateString);
-    const dayIndex = date.getDay();
-    return daysOfWeek[dayIndex];
-  };
-
-  const getDateLabel = (index: number, date: string) => {
-    switch (index) {
-      case 0:
-        return 'Bugün';
-      case 1:
-        return 'Yarın';
-      default:
-        return getDayLabel(date);
-    }
+  const navigateForecast = () => {
+    navigation.navigate(Routes.Forecast);
   };
 
   const getHourLabel = (index: number, item: any) => {
@@ -123,7 +110,7 @@ const HomeScreen = ({navigation}: any) => {
     const time = `${ItemDay}/${ItemMonth}`;
 
     if (index === 0) {
-      return 'Şimdi';
+      return STRINGS.now;
     } else if (item.time.substring(11, 16) === '00:00') {
       return time;
     } else {
@@ -133,28 +120,28 @@ const HomeScreen = ({navigation}: any) => {
 
   const List = [
     {
-      text: 'Hissedilen',
+      text: STRINGS.felt_temperature,
       value: currentList?.feelslike_c + '\u00B0C',
     },
     {
-      text: 'Nem',
+      text: STRINGS.humidity,
       value: currentList?.humidity + '\u0025',
     },
     {
-      text: 'Yağmur yağma olasılığı',
+      text: STRINGS.daily_chance_of_rain,
       value:
         forecastList && forecastList[0].day.daily_chance_of_rain + '\u0025',
     },
     {
-      text: 'Basınç',
+      text: STRINGS.pressure,
       value: currentList?.pressure_mb + 'mbar',
     },
     {
-      text: 'Rüzgar hızı',
+      text: STRINGS.wind_speed,
       value: currentList?.wind_kph + 'km/s',
     },
     {
-      text: 'UV endeksi',
+      text: STRINGS.uv,
       value: currentList?.uv,
     },
   ];
@@ -168,7 +155,7 @@ const HomeScreen = ({navigation}: any) => {
       {!weatherData ? (
         <View style={styles.splash_bg}>
           <View style={styles.splash_text_container}>
-            <Text style={styles.splash_text}>Yalnızca 1 saniye...</Text>
+            <Text style={styles.splash_text}>{STRINGS.only_one_sec}</Text>
           </View>
         </View>
       ) : (
@@ -230,11 +217,13 @@ const HomeScreen = ({navigation}: any) => {
               }}
               numColumns={1}
             />
-            <View style={styles.five_days_forecast_container}>
-              <Text style={styles.five_days_forecast}>
-                5 günlük hava durumu tahmini
-              </Text>
-            </View>
+            <TouchableWithoutFeedback onPress={navigateForecast}>
+              <View style={styles.five_days_forecast_container}>
+                <Text style={styles.five_days_forecast}>
+                  {STRINGS.three_days_forecast}
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
             {forecastList && (
               <FlatList
                 horizontal={true}
