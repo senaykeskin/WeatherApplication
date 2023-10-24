@@ -2,16 +2,27 @@ import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 import {styles} from './styles';
 import {useFocusEffect} from '@react-navigation/native';
-import {fetchDataTransfer, getDateLabel} from '../../constants';
+import {
+  fetchDataTransfer,
+  getDateLabel,
+  getDegreeValue,
+  max_temp,
+  min_temp,
+} from '../../constants';
 import ForecastContainer from './components/DailyForecast';
 import {COLORS} from '../../utils/colors';
 import {STRINGS} from '../../utils/strings';
 
 const ForecastScreen = () => {
   const [weatherData, setWeatherData] = useState<any | null>(null);
+  const [isDegree, setIsDegree] = useState('');
 
   useFocusEffect(
     React.useCallback(() => {
+      getDegreeValue().then(data => {
+        data === '0' ? setIsDegree('\u00B0F') : setIsDegree('\u00B0C');
+      });
+
       const fetchData = async () => {
         try {
           const data = await fetchDataTransfer();
@@ -20,7 +31,7 @@ const ForecastScreen = () => {
             setWeatherData(data);
           }
         } catch (error) {
-          console.error('Veri alma hatası:', error);
+          //console.error('Veri alma hatası:', error);
         }
       };
 
@@ -49,8 +60,8 @@ const ForecastScreen = () => {
               <ForecastContainer
                 day={dateLabel}
                 date={editDate}
-                maxTemp={item.day.maxtemp_c}
-                minTemp={item.day.mintemp_c}
+                maxTemp={max_temp(item, isDegree)}
+                minTemp={min_temp(item, isDegree)}
                 daytime={item.day.condition.icon}
                 wind={item.day.maxwind_kph}
                 style={

@@ -57,7 +57,7 @@ const SearchScreen = ({navigation}: any) => {
     }
   };
 
-  const handleTextDebounce = useCallback(debounce(handleSearch, 800), []);
+  const handleTextDebounce = useCallback(debounce(handleSearch, 500), []);
 
   return (
     <View style={styles.container}>

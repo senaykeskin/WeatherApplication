@@ -1,6 +1,6 @@
 export const Routes = {
+  Forecast: 'Forecast',
   Home: 'Home',
   Search: 'SearchScreen',
-  Splash: 'Splash',
-  Forecast: 'Forecast',
+  Settings: 'Settings',
 };

@@ -13,21 +13,33 @@ import {styles} from './styles';
 import AddIcon from 'react-native-vector-icons/MaterialIcons';
 import Settings from 'react-native-vector-icons/MaterialIcons';
 import Celsius from 'react-native-vector-icons/MaterialCommunityIcons';
+import Fahrenheit from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../../../utils/colors';
 import {Routes} from '../../../navigator/routes';
 import IconAndWeather from './components/ThreeDaysForecast';
 import Hourly from './components/HourlyForecast';
 import BottomContainer from './components/OtherInformations';
 import {useFocusEffect} from '@react-navigation/native';
-import {fetchDataTransfer, getDateLabel} from '../../../constants';
+import {
+  fetchDataTransfer,
+  getDateLabel,
+  getDegreeValue,
+  max_temp,
+  min_temp,
+} from '../../../constants';
 import {STRINGS} from '../../../utils/strings';
 
 const HomeScreen = ({navigation}: any) => {
   const [weatherData, setWeatherData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isDegree, setIsDegree] = useState<string>('');
 
   useFocusEffect(
     React.useCallback(() => {
+      getDegreeValue().then(data => {
+        data === '0' ? setIsDegree('\u00B0F') : setIsDegree('\u00B0C');
+      });
+
       const fetchData = async () => {
         setIsLoading(true);
 
@@ -51,13 +63,13 @@ const HomeScreen = ({navigation}: any) => {
           clearInterval(interval);
         };
       };
-
       fetchData().then();
     }, []),
   );
 
   const forecastList = weatherData?.forecast.forecastday;
-  const roundedTemp = Math.floor(weatherData?.current.temp_c);
+  const roundedTempCelsius = Math.floor(weatherData?.current.temp_c);
+  const roundedTempFahrenheit = Math.floor(weatherData?.current.temp_f);
   const [currentTime, setCurrentTime] = useState(new Date());
   const weatherData_text = weatherData?.current.condition.text;
   const currentList = weatherData?.current;
@@ -103,6 +115,10 @@ const HomeScreen = ({navigation}: any) => {
     navigation.navigate(Routes.Forecast);
   };
 
+  const navigateSettings = () => {
+    navigation.navigate(Routes.Settings);
+  };
+
   const getHourLabel = (index: number, item: any) => {
     const ItemDay = item.time.substring(8, 10);
     const ItemMonth = item.time.substring(5, 7);
@@ -118,10 +134,34 @@ const HomeScreen = ({navigation}: any) => {
     }
   };
 
+  const value = () => {
+    if (isDegree === '\u00B0F') {
+      return currentList?.feelslike_f + '\u00B0F';
+    } else {
+      return currentList?.feelslike_c + '\u00B0C';
+    }
+  };
+
+  const roundedTemp = () => {
+    if (isDegree === '\u00B0F') {
+      return roundedTempFahrenheit;
+    } else {
+      return roundedTempCelsius;
+    }
+  };
+
+  const temp = (item: any) => {
+    if (isDegree === '\u00B0F') {
+      return item.temp_f;
+    } else {
+      return item.temp_c;
+    }
+  };
+
   const List = [
     {
       text: STRINGS.felt_temperature,
-      value: currentList?.feelslike_c + '\u00B0C',
+      value: value(),
     },
     {
       text: STRINGS.humidity,
@@ -145,6 +185,28 @@ const HomeScreen = ({navigation}: any) => {
       value: currentList?.uv,
     },
   ];
+
+  const degree_fahrenheit = (isDegree: string) => {
+    if (isDegree === '\u00B0C') {
+      return (
+        <Celsius
+          name={'temperature-celsius'}
+          size={30}
+          color={COLORS.white}
+          style={styles.celsius}
+        />
+      );
+    } else if (isDegree === '\u00B0F') {
+      return (
+        <Fahrenheit
+          name={'temperature-fahrenheit'}
+          size={30}
+          color={COLORS.white}
+          style={styles.fahrenheit}
+        />
+      );
+    }
+  };
 
   return (
     <View>
@@ -172,12 +234,14 @@ const HomeScreen = ({navigation}: any) => {
               <AddIcon name={'add'} size={40} color={COLORS.add_icon} />
             </TouchableWithoutFeedback>
             <Text style={styles.city_name}>{weatherData?.location.name}</Text>
-            <Settings
-              name={'settings'}
-              size={30}
-              color={COLORS.white}
-              style={styles.settings_icon}
-            />
+            <TouchableWithoutFeedback onPress={navigateSettings}>
+              <Settings
+                name={'settings'}
+                size={30}
+                color={COLORS.white}
+                style={styles.settings_icon}
+              />
+            </TouchableWithoutFeedback>
           </View>
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -187,13 +251,8 @@ const HomeScreen = ({navigation}: any) => {
             overScrollMode="never">
             <View style={styles.degree_area}>
               <View style={styles.degree_and_celsius}>
-                <Text style={styles.degree}>{roundedTemp}</Text>
-                <Celsius
-                  name={'temperature-celsius'}
-                  size={30}
-                  color={COLORS.white}
-                  style={styles.celsius}
-                />
+                <Text style={styles.degree}>{roundedTemp()}</Text>
+                {degree_fahrenheit(isDegree)}
               </View>
               <View style={styles.area}>
                 <Text style={styles.weather}>{weatherData_text}</Text>
@@ -210,16 +269,16 @@ const HomeScreen = ({navigation}: any) => {
                     icon={'https:' + item.day.condition.icon}
                     date={dateLabel}
                     text={item.day.condition.text}
-                    maxTemp={item.day.maxtemp_c}
-                    minTemp={item.day.mintemp_c}
+                    maxTemp={max_temp(item, isDegree)}
+                    minTemp={min_temp(item, isDegree)}
                   />
                 );
               }}
               numColumns={1}
             />
             <TouchableWithoutFeedback onPress={navigateForecast}>
-              <View style={styles.five_days_forecast_container}>
-                <Text style={styles.five_days_forecast}>
+              <View style={styles.three_days_forecast_container}>
+                <Text style={styles.three_days_forecast}>
                   {STRINGS.three_days_forecast}
                 </Text>
               </View>
@@ -276,7 +335,7 @@ const HomeScreen = ({navigation}: any) => {
                   return (
                     <Hourly
                       hour={hourData}
-                      weather={item.temp_c}
+                      weather={temp(item)}
                       icon={'https:' + item.condition.icon}
                       wind={item.wind_kph}
                       wind_dir={item.wind_dir}
