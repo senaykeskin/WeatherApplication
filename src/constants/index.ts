@@ -16,6 +16,34 @@ export const fetchDataTransfer = async () => {
   });
 };
 
+export const getDegreeValue = async () => {
+  const firstData = await getData('isDegree');
+  let data;
+  if (firstData === undefined) {
+    data = '1';
+    await setData('isDegre', data);
+  } else {
+    data = firstData;
+  }
+  return data;
+};
+
+export const max_temp = (props: any, isDegree: string) => {
+  if (isDegree === '\u00B0F') {
+    return props.day.maxtemp_f;
+  } else {
+    return props.day.maxtemp_c;
+  }
+};
+
+export const min_temp = (props: any, isDegree: string) => {
+  if (isDegree === '\u00B0F') {
+    return props.day.mintemp_f;
+  } else {
+    return props.day.mintemp_c;
+  }
+};
+
 export const getWindDirection = (props: any) => {
   switch (props) {
     case 'N':

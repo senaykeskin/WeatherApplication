@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
     height: '100%',
   },
   degree_area: {
-    height: 300,
+    height: 350,
     marginTop: '10%',
   },
   degree_and_celsius: {
@@ -67,6 +67,13 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     fontWeight: 'bold',
   },
+  fahrenheit: {
+    position: 'absolute',
+    top: 35,
+    right: 110,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+  },
   area: {
     flexDirection: 'column',
     justifyContent: 'center',
@@ -78,17 +85,17 @@ export const styles = StyleSheet.create({
     color: COLORS.white,
     textAlign: 'center',
   },
-  five_days_forecast_container: {
+  three_days_forecast_container: {
     height: 60,
     width: '90%',
-    backgroundColor: COLORS.five_days_forecast_container,
+    backgroundColor: COLORS.three_days_forecast_container,
     borderRadius: 30,
     justifyContent: 'center',
     alignSelf: 'center',
     marginTop: '5%',
     opacity: 0.8,
   },
-  five_days_forecast: {
+  three_days_forecast: {
     alignSelf: 'center',
     fontSize: 20,
     fontWeight: 'bold',
@@ -106,6 +113,6 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     opacity: 0.8,
     padding: 25,
-    backgroundColor: COLORS.five_days_forecast_container,
+    backgroundColor: COLORS.three_days_forecast_container,
   },
 });

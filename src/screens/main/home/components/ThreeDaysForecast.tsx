@@ -1,10 +1,19 @@
 import * as React from 'react';
 import {Image, Text, View} from 'react-native';
 import {styles} from './styles';
+import {useEffect, useState} from 'react';
+import {getDegreeValue} from '../../../../constants';
 
 const IconAndWeather = ({icon, date, text, maxTemp, minTemp}: any) => {
   const roundedMaxTemp = Math.floor(maxTemp);
   const roundedMinTemp = Math.floor(minTemp);
+  const [isDegree, setIsDegree] = useState<string>('');
+
+  useEffect(() => {
+    getDegreeValue().then(data => {
+      data === '0' ? setIsDegree('\u00B0F') : setIsDegree('\u00B0C');
+    });
+  });
 
   return (
     <View>
@@ -17,7 +26,9 @@ const IconAndWeather = ({icon, date, text, maxTemp, minTemp}: any) => {
           {date} - {text}
         </Text>
         <Text style={styles.min_max_temp}>
-          {roundedMaxTemp}&#176;C / {roundedMinTemp}&#176;C
+          {roundedMaxTemp}
+          {isDegree} / {roundedMinTemp}
+          {isDegree}
         </Text>
       </View>
     </View>

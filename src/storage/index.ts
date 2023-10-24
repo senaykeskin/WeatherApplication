@@ -4,7 +4,7 @@ const setData = async (key: string, value: any) => {
   try {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem(key, jsonValue);
-    //console.log('Data kaydedildi.');
+    //console.log('Data kaydedildi.', jsonValue);
   } catch (error) {
     //console.log('storeData error: ', error);
   }

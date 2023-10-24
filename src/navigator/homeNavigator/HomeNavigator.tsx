@@ -4,6 +4,8 @@ import HomeScreen from '../../screens/main/home';
 import SearchScreen from '../../screens/search';
 import ForecastScreen from '../../screens/fiveDaysForecast';
 import {COLORS} from '../../utils/colors';
+import Settings from '../../screens/settings';
+import SettingsScreen from '../../screens/settings';
 
 const StackMain = createStackNavigator();
 const HomeNavigator = () => {
@@ -22,6 +24,16 @@ const HomeNavigator = () => {
       <StackMain.Screen
         name={Routes.Forecast}
         component={ForecastScreen}
+        options={{
+          headerShown: true,
+          title: '',
+          headerStyle: {backgroundColor: COLORS.black},
+          headerTintColor: COLORS.white,
+        }}
+      />
+      <StackMain.Screen
+        name={Routes.Settings}
+        component={SettingsScreen}
         options={{
           headerShown: true,
           title: '',
